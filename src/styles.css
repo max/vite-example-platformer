@@ -1,0 +1,145 @@
+:root {
+  color-scheme: dark;
+  --screen: #0000aa;
+  --panel: #0000aa;
+  --ink: #ffffff;
+  --bright: #e6fff8;
+  --muted: #b9d7ff;
+  --line: #ffffff;
+  --shadow: #000064;
+  --accent: #b9d7ff;
+  --accent-pressed: #ffffff;
+  --danger: #00ffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  align-items: center;
+  background: var(--screen);
+  color: var(--ink);
+  display: flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  justify-content: center;
+  padding: 24px;
+  text-shadow: none;
+}
+
+.game-shell {
+  background: var(--panel);
+  border: 3px double var(--line);
+  box-shadow:
+    0 0 0 4px var(--panel),
+    0 0 0 6px var(--line);
+  display: grid;
+  gap: 12px;
+  max-width: 960px;
+  padding: 16px;
+  width: min(100%, 960px);
+}
+
+.hud {
+  align-items: end;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  min-height: 36px;
+  padding-bottom: 2px;
+  position: relative;
+}
+
+.hud::before {
+  color: var(--bright);
+  content: "A fatal exception 0D has occurred at 0028:D1N0RUN";
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hud div {
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.hud strong {
+  color: var(--bright);
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+canvas {
+  aspect-ratio: 45 / 16;
+  background: var(--screen);
+  border: 2px solid var(--line);
+  display: block;
+  image-rendering: pixelated;
+  outline: 2px solid var(--shadow);
+  outline-offset: -8px;
+  width: 100%;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+button {
+  appearance: none;
+  background: var(--accent);
+  border: 2px solid var(--line);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--shadow);
+  color: #0000aa;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 42px;
+  min-width: 112px;
+  padding: 0 18px;
+  text-transform: uppercase;
+}
+
+button:active {
+  background: var(--accent-pressed);
+  box-shadow: 2px 2px 0 var(--shadow);
+  transform: translate(2px, 2px);
+}
+
+.restart-button {
+  background: var(--danger);
+  color: #0000aa;
+}
+
+@media (max-width: 620px) {
+  body {
+    padding: 14px;
+  }
+
+  .hud {
+    justify-content: space-between;
+  }
+
+  canvas {
+    aspect-ratio: 3 / 2;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
