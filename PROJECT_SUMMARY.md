@@ -15,7 +15,7 @@ This project started as a local experiment to build a small clone of the Google 
 
 ## Work Completed
 
-- Created a React + Vite app using Bun as the available local JavaScript runtime.
+- Created a React + Vite app, now using npm as the package manager.
 - Implemented a canvas-based endless runner with:
   - Player jump physics
   - Variable-height jump release behavior
@@ -35,13 +35,13 @@ This project started as a local experiment to build a small clone of the Google 
   - Square system-style buttons
   - Blue/white/cyan/gray canvas palette
 - Added `.gitignore` entries for generated dependencies and build output.
-- Verified the production build with `bun run build`.
+- Verified the production build with `npm run build`.
 
 ## Tech Stack
 
 - React
 - Vite
-- Bun
+- npm
 - Canvas 2D API
 - Plain CSS
 
@@ -50,21 +50,21 @@ This project started as a local experiment to build a small clone of the Google 
 Install dependencies:
 
 ```sh
-bun install
+npm install
 ```
 
 Start the development server:
 
 ```sh
-bun run dev -- --host 0.0.0.0 --port 5173
+npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
 Build for production:
 
 ```sh
-bun run build
+npm run build
 ```
 
 ## Notes
 
-Node and npm were not available in the local shell, so Bun was used for package installation, builds, and the Vite development server.
+The project has been ported from Bun to npm. Use `package-lock.json` for reproducible installs and avoid committing a Bun lockfile.
