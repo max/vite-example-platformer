@@ -18,7 +18,7 @@ const colors = {
   dim: "#5f8fd8",
   coin: "#ffffff",
   coinDark: "#b9d7ff",
-  coinLine: "#000000",
+  coinLine: "#b9d7ff",
   cactus: "#00ffff",
   rock: "#c0c0c0",
 };
@@ -92,12 +92,6 @@ function drawCoin(ctx, game, faceImage) {
   ctx.beginPath();
   ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
   ctx.fill();
-
-  ctx.strokeStyle = colors.coinLine;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.arc(0, 0, radius - 8, 0, Math.PI * 2);
-  ctx.stroke();
 
   if (faceImage?.complete) {
     ctx.drawImage(faceImage, -17, -17, 34, 34);
