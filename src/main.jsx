@@ -140,14 +140,10 @@ function drawGround(ctx, game, width) {
 function drawMessage(ctx, game, width) {
   if (game.started && game.running) return;
 
-  ctx.fillStyle = colors.bright;
-  ctx.font = "700 28px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-  ctx.textAlign = "center";
-  ctx.fillText(game.message, width / 2, 116);
-
   ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
   ctx.fillStyle = colors.muted;
-  ctx.fillText("PRESS SPACE TO CONTINUE _", width / 2, 144);
+  ctx.textAlign = "center";
+  ctx.fillText("PRESS SPACE TO CONTINUE _", width / 2, 128);
 }
 
 function spawnObstacle(game, width) {
