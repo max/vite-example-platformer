@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import jumpSoundSrc from "./assets/chrome-button-press.ogg";
 import nosyFaceSrc from "./assets/nosy-face.svg";
 import "./styles.css";
 
@@ -257,6 +258,7 @@ function App() {
   const lastTimeRef = useRef(0);
   const animationRef = useRef(0);
   const faceImageRef = useRef(null);
+  const jumpSoundRef = useRef(null);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(() => Number(localStorage.getItem(bestKey) || 0));
 
@@ -281,6 +283,11 @@ function App() {
       game.coin.vy = jumpVelocity;
       game.coin.grounded = false;
       game.coin.flip = Math.PI / 2;
+
+      if (jumpSoundRef.current) {
+        jumpSoundRef.current.currentTime = 0;
+        jumpSoundRef.current.play().catch(() => {});
+      }
     }
   };
 
@@ -296,6 +303,10 @@ function App() {
     const faceImage = new Image();
     faceImage.src = nosyFaceSrc;
     faceImageRef.current = faceImage;
+
+    const jumpSound = new Audio(jumpSoundSrc);
+    jumpSound.preload = "auto";
+    jumpSoundRef.current = jumpSound;
   }, []);
 
   useEffect(() => {
