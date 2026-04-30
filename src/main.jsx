@@ -7,26 +7,32 @@ const gravity = 2300;
 const jumpVelocity = -760;
 const jumpCutVelocity = -260;
 const baseSpeed = 360;
-const bestKey = "dino-runner-best";
+const bestKey = "coin-runner-best";
+const coinSize = 54;
 const colors = {
   screen: "#0000aa",
   ink: "#ffffff",
   bright: "#ffffff",
   muted: "#b9d7ff",
   dim: "#5f8fd8",
+  coin: "#ffd75a",
+  coinDark: "#c9861a",
+  coinLine: "#fff2a6",
+  coinFace: "#231700",
   cactus: "#00ffff",
   rock: "#c0c0c0",
 };
 
 function createGame() {
   return {
-    dino: {
+    coin: {
       x: 72,
-      y: groundY - 54,
-      width: 46,
-      height: 54,
+      y: groundY - coinSize,
+      width: coinSize,
+      height: coinSize,
       vy: 0,
       grounded: true,
+      flip: 0,
     },
     clouds: [
       { x: 160, y: 72, speed: 22 },
@@ -64,36 +70,47 @@ function drawCloud(ctx, cloud) {
   ctx.fillRect(cloud.x + 32, cloud.y + 5, 24, 18);
 }
 
-function drawDino(ctx, game) {
-  const { dino } = game;
-  const runningFrame = game.started && game.running && dino.grounded
-    ? Math.floor(game.distance / 32) % 2
-    : 0;
+function drawCoin(ctx, game) {
+  const { coin } = game;
+  const centerX = coin.x + coin.width / 2;
+  const centerY = coin.y + coin.height / 2;
+  const rollAngle = game.distance / 14;
+  const faceScale = coin.grounded ? 1 : Math.max(0.16, Math.abs(Math.cos(coin.flip)));
+  const radius = coin.width / 2;
 
-  ctx.fillStyle = colors.ink;
-  ctx.fillRect(dino.x + 10, dino.y + 12, 24, 31);
-  ctx.fillRect(dino.x + 22, dino.y, 25, 24);
-  ctx.fillRect(dino.x + 41, dino.y + 7, 8, 7);
-  ctx.fillRect(dino.x + 4, dino.y + 30, 10, 9);
-  ctx.fillRect(dino.x, dino.y + 20, 12, 5);
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.scale(faceScale, 1);
+  ctx.rotate(coin.grounded ? rollAngle : 0);
 
-  if (dino.grounded) {
-    if (runningFrame === 0) {
-      ctx.fillRect(dino.x + 12, dino.y + 43, 8, 13);
-      ctx.fillRect(dino.x + 30, dino.y + 43, 8, 8);
-      ctx.fillRect(dino.x + 34, dino.y + 51, 13, 5);
-    } else {
-      ctx.fillRect(dino.x + 12, dino.y + 43, 8, 8);
-      ctx.fillRect(dino.x, dino.y + 51, 20, 5);
-      ctx.fillRect(dino.x + 30, dino.y + 43, 8, 13);
-    }
-  } else {
-    ctx.fillRect(dino.x + 12, dino.y + 43, 8, 12);
-    ctx.fillRect(dino.x + 30, dino.y + 43, 8, 12);
+  ctx.fillStyle = colors.coinDark;
+  ctx.beginPath();
+  ctx.arc(2, 2, radius - 1, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = colors.coin;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius - 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colors.coinLine;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius - 8, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = colors.coinFace;
+  ctx.fillRect(-13, -8, 7, 7);
+  ctx.fillRect(6, -8, 7, 7);
+  ctx.fillRect(-11, 9, 22, 4);
+  ctx.fillRect(-15, 5, 5, 5);
+  ctx.fillRect(10, 5, 5, 5);
+  ctx.restore();
+
+  if (!coin.grounded) {
+    ctx.fillStyle = colors.coinLine;
+    ctx.fillRect(centerX - 3, coin.y - 10, 6, 6);
   }
-
-  ctx.fillStyle = colors.screen;
-  ctx.fillRect(dino.x + 37, dino.y + 7, 4, 4);
 }
 
 function drawObstacle(ctx, obstacle) {
@@ -158,7 +175,7 @@ function spawnObstacle(game, width) {
 }
 
 function updateGame(game, delta, width, setBestScore) {
-  const dino = game.dino;
+  const coin = game.coin;
   game.distance += game.speed * delta;
   game.score = game.distance / 42;
   game.speed = baseSpeed + Math.min(280, game.score * 0.52);
@@ -168,13 +185,16 @@ function updateGame(game, delta, width, setBestScore) {
     spawnObstacle(game, width);
   }
 
-  dino.vy += gravity * delta;
-  dino.y += dino.vy * delta;
+  coin.vy += gravity * delta;
+  coin.y += coin.vy * delta;
 
-  if (dino.y >= groundY - dino.height) {
-    dino.y = groundY - dino.height;
-    dino.vy = 0;
-    dino.grounded = true;
+  if (coin.y >= groundY - coin.height) {
+    coin.y = groundY - coin.height;
+    coin.vy = 0;
+    coin.grounded = true;
+  } else {
+    coin.flip += delta * 13;
+    coin.grounded = false;
   }
 
   for (const cloud of game.clouds) {
@@ -191,11 +211,11 @@ function updateGame(game, delta, width, setBestScore) {
 
   game.obstacles = game.obstacles.filter((obstacle) => obstacle.x + obstacle.width > -20);
 
-  const dinoHitbox = {
-    x: dino.x + 8,
-    y: dino.y + 6,
-    width: dino.width - 14,
-    height: dino.height - 10,
+  const coinHitbox = {
+    x: coin.x + 8,
+    y: coin.y + 8,
+    width: coin.width - 16,
+    height: coin.height - 16,
   };
 
   for (const obstacle of game.obstacles) {
@@ -206,7 +226,7 @@ function updateGame(game, delta, width, setBestScore) {
       height: obstacle.height - 4,
     };
 
-    if (rectsOverlap(dinoHitbox, obstacleHitbox)) {
+    if (rectsOverlap(coinHitbox, obstacleHitbox)) {
       game.running = false;
       game.message = "Game Over";
       const score = Math.floor(game.score);
@@ -235,7 +255,7 @@ function drawGame(ctx, game, width, height) {
     drawObstacle(ctx, obstacle);
   }
 
-  drawDino(ctx, game);
+  drawCoin(ctx, game);
   drawMessage(ctx, game, width);
 }
 
@@ -264,17 +284,18 @@ function App() {
     game.started = true;
     game.message = "";
 
-    if (game.dino.grounded) {
-      game.dino.vy = jumpVelocity;
-      game.dino.grounded = false;
+    if (game.coin.grounded) {
+      game.coin.vy = jumpVelocity;
+      game.coin.grounded = false;
+      game.coin.flip = Math.PI / 2;
     }
   };
 
   const cutJumpShort = () => {
-    const dino = gameRef.current.dino;
+    const { coin } = gameRef.current;
 
-    if (!dino.grounded && dino.vy < jumpCutVelocity) {
-      dino.vy = jumpCutVelocity;
+    if (!coin.grounded && coin.vy < jumpCutVelocity) {
+      coin.vy = jumpCutVelocity;
     }
   };
 
@@ -331,7 +352,7 @@ function App() {
   });
 
   return (
-    <main className="game-shell" aria-label="Dino Runner">
+    <main className="game-shell" aria-label="Coin Runner">
       <section className="hud" aria-label="Game status">
         <div>
           <span className="label">Score</span>
@@ -342,7 +363,7 @@ function App() {
           <strong>{padScore(bestScore)}</strong>
         </div>
       </section>
-      <canvas ref={canvasRef} width="900" height="320" aria-label="Dino runner game canvas" />
+      <canvas ref={canvasRef} width="900" height="320" aria-label="Coin runner game canvas" />
       <div className="controls">
         <button type="button" onClick={jump}>Jump</button>
         <button type="button" className="restart-button" onClick={reset}>Restart</button>
