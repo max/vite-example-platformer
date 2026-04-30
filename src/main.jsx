@@ -361,8 +361,22 @@ function App() {
     };
   });
 
+  const handlePointerDown = () => {
+    jump();
+  };
+
+  const handlePointerUp = () => {
+    cutJumpShort();
+  };
+
   return (
-    <main className="game-shell" aria-label="Nosy Run">
+    <main
+      className="game-shell"
+      aria-label="Nosy Run"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
       <section className="hud" aria-label="Game status">
         <div>
           <span className="label">Score</span>
@@ -374,10 +388,6 @@ function App() {
         </div>
       </section>
       <canvas ref={canvasRef} width="900" height="320" aria-label="Nosy Run game canvas" />
-      <div className="controls">
-        <button type="button" onClick={jump}>Jump</button>
-        <button type="button" className="restart-button" onClick={reset}>Restart</button>
-      </div>
     </main>
   );
 }
