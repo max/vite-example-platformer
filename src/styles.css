@@ -29,7 +29,7 @@ body {
   display: flex;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   justify-content: center;
-  padding: 24px;
+  padding: 28px;
   text-shadow: none;
 }
 
@@ -86,10 +86,13 @@ canvas {
   background: var(--screen);
   border: 2px solid var(--line);
   display: block;
+  height: clamp(240px, 42vh, 320px);
   image-rendering: pixelated;
   outline: 2px solid var(--shadow);
   outline-offset: -8px;
-  width: 100%;
+  justify-self: center;
+  max-width: 100%;
+  width: auto;
 }
 
 .controls {
@@ -127,7 +130,8 @@ button:active {
 
 @media (max-width: 620px) {
   body {
-    padding: 14px;
+    align-items: start;
+    padding: 16px 10px;
   }
 
   .hud {
@@ -136,6 +140,8 @@ button:active {
 
   canvas {
     aspect-ratio: 45 / 16;
+    height: auto;
+    width: 100%;
   }
 
   .controls {
