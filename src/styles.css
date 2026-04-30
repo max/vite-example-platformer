@@ -54,6 +54,6 @@ canvas {
   justify-self: center;
   max-width: 100%;
   max-height: 100%;
-  place-self: center;
+  place-self: end center;
   width: min(100%, calc((100vh - 32px) * 45 / 16));
 }
