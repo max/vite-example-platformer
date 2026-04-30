@@ -35,10 +35,6 @@ body {
 
 .game-shell {
   background: var(--panel);
-  border: 3px double var(--line);
-  box-shadow:
-    0 0 0 4px var(--panel),
-    0 0 0 6px var(--line);
   display: grid;
   gap: 12px;
   max-width: 960px;
