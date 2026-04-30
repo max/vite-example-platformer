@@ -64,6 +64,10 @@ function rectsOverlap(a, b) {
   );
 }
 
+function isTouchPrimaryDevice() {
+  return window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+}
+
 function drawCloud(ctx, cloud) {
   ctx.fillStyle = colors.dim;
   ctx.fillRect(cloud.x, cloud.y + 12, 68, 12);
@@ -137,13 +141,13 @@ function drawGround(ctx, game, width) {
   }
 }
 
-function drawMessage(ctx, game, width) {
+function drawMessage(ctx, game, width, startPrompt) {
   if (game.started && game.running) return;
 
   ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
   ctx.fillStyle = colors.muted;
   ctx.textAlign = "center";
-  ctx.fillText("PRESS SPACE TO CONTINUE _", width / 2, 128);
+  ctx.fillText(startPrompt, width / 2, 128);
 }
 
 function drawScoreboard(ctx, score, bestScore, width) {
@@ -239,7 +243,7 @@ function updateGame(game, delta, width, bestScoreRef) {
   }
 }
 
-function drawGame(ctx, game, width, height, faceImage, bestScore) {
+function drawGame(ctx, game, width, height, faceImage, bestScore, startPrompt) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = colors.screen;
   ctx.fillRect(0, 0, width, height);
@@ -255,7 +259,7 @@ function drawGame(ctx, game, width, height, faceImage, bestScore) {
   }
 
   drawCoin(ctx, game, faceImage);
-  drawMessage(ctx, game, width);
+  drawMessage(ctx, game, width, startPrompt);
   drawScoreboard(ctx, game.score, bestScore, width);
 }
 
@@ -266,6 +270,7 @@ function App() {
   const animationRef = useRef(0);
   const faceImageRef = useRef(null);
   const jumpSoundRef = useRef(null);
+  const startPromptRef = useRef("PRESS SPACE TO CONTINUE _");
   const bestScoreRef = useRef(Number(localStorage.getItem(bestKey) || 0));
 
   const reset = () => {
@@ -305,6 +310,10 @@ function App() {
   };
 
   useEffect(() => {
+    startPromptRef.current = isTouchPrimaryDevice()
+      ? "TAP TO CONTINUE _"
+      : "PRESS SPACE TO CONTINUE _";
+
     const faceImage = new Image();
     faceImage.src = nosyFaceSrc;
     faceImageRef.current = faceImage;
@@ -327,7 +336,15 @@ function App() {
         updateGame(game, delta, canvas.width, bestScoreRef);
       }
 
-      drawGame(ctx, game, canvas.width, canvas.height, faceImageRef.current, bestScoreRef.current);
+      drawGame(
+        ctx,
+        game,
+        canvas.width,
+        canvas.height,
+        faceImageRef.current,
+        bestScoreRef.current,
+        startPromptRef.current,
+      );
       animationRef.current = requestAnimationFrame(loop);
     };
 
