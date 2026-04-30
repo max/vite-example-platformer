@@ -135,7 +135,7 @@ button:active {
   }
 
   canvas {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 45 / 16;
   }
 
   .controls {
