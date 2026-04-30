@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import jumpSoundSrc from "./assets/chrome-button-press.ogg";
 import nosyFaceSrc from "./assets/nosy-face.svg";
@@ -146,6 +146,19 @@ function drawMessage(ctx, game, width) {
   ctx.fillText("PRESS SPACE TO CONTINUE _", width / 2, 128);
 }
 
+function drawScoreboard(ctx, score, bestScore, width) {
+  ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+  ctx.textAlign = "right";
+
+  ctx.fillStyle = colors.muted;
+  ctx.fillText("SCORE", width - 170, 26);
+  ctx.fillText("BEST", width - 54, 26);
+
+  ctx.fillStyle = colors.bright;
+  ctx.fillText(padScore(score), width - 170, 46);
+  ctx.fillText(padScore(bestScore), width - 54, 46);
+}
+
 function spawnObstacle(game, width) {
   const tall = Math.random() > 0.45;
   const obstacleWidth = tall ? 30 : 46;
@@ -163,7 +176,7 @@ function spawnObstacle(game, width) {
   game.spawnTimer = (0.95 + Math.random() * 0.7) * speedFactor;
 }
 
-function updateGame(game, delta, width, setBestScore) {
+function updateGame(game, delta, width, bestScoreRef) {
   const coin = game.coin;
   game.distance += game.speed * delta;
   game.score = game.distance / 42;
@@ -219,17 +232,14 @@ function updateGame(game, delta, width, setBestScore) {
       game.running = false;
       game.message = "Game Over";
       const score = Math.floor(game.score);
-      setBestScore((currentBest) => {
-        const nextBest = Math.max(currentBest, score);
-        localStorage.setItem(bestKey, String(nextBest));
-        return nextBest;
-      });
+      bestScoreRef.current = Math.max(bestScoreRef.current, score);
+      localStorage.setItem(bestKey, String(bestScoreRef.current));
       break;
     }
   }
 }
 
-function drawGame(ctx, game, width, height, faceImage) {
+function drawGame(ctx, game, width, height, faceImage, bestScore) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = colors.screen;
   ctx.fillRect(0, 0, width, height);
@@ -246,6 +256,7 @@ function drawGame(ctx, game, width, height, faceImage) {
 
   drawCoin(ctx, game, faceImage);
   drawMessage(ctx, game, width);
+  drawScoreboard(ctx, game.score, bestScore, width);
 }
 
 function App() {
@@ -255,13 +266,11 @@ function App() {
   const animationRef = useRef(0);
   const faceImageRef = useRef(null);
   const jumpSoundRef = useRef(null);
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(() => Number(localStorage.getItem(bestKey) || 0));
+  const bestScoreRef = useRef(Number(localStorage.getItem(bestKey) || 0));
 
   const reset = () => {
     gameRef.current = createGame();
     lastTimeRef.current = performance.now();
-    setScore(0);
   };
 
   const jump = () => {
@@ -315,11 +324,10 @@ function App() {
       lastTimeRef.current = now;
 
       if (game.started && game.running) {
-        updateGame(game, delta, canvas.width, setBestScore);
-        setScore(game.score);
+        updateGame(game, delta, canvas.width, bestScoreRef);
       }
 
-      drawGame(ctx, game, canvas.width, canvas.height, faceImageRef.current);
+      drawGame(ctx, game, canvas.width, canvas.height, faceImageRef.current, bestScoreRef.current);
       animationRef.current = requestAnimationFrame(loop);
     };
 
@@ -373,16 +381,6 @@ function App() {
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      <section className="hud" aria-label="Game status">
-        <div>
-          <span className="label">Score</span>
-          <strong>{padScore(score)}</strong>
-        </div>
-        <div>
-          <span className="label">Best</span>
-          <strong>{padScore(bestScore)}</strong>
-        </div>
-      </section>
       <canvas ref={canvasRef} width="900" height="320" aria-label="Nosy Run game canvas" />
     </main>
   );
