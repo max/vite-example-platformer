@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import nosyFaceSrc from "./assets/nosy-face.svg";
 import "./styles.css";
 
 const groundY = 246;
@@ -18,7 +19,6 @@ const colors = {
   coin: "#ffffff",
   coinDark: "#b9d7ff",
   coinLine: "#000000",
-  coinFace: "#000000",
   cactus: "#00ffff",
   rock: "#c0c0c0",
 };
@@ -70,7 +70,7 @@ function drawCloud(ctx, cloud) {
   ctx.fillRect(cloud.x + 32, cloud.y + 5, 24, 18);
 }
 
-function drawCoin(ctx, game) {
+function drawCoin(ctx, game, faceImage) {
   const { coin } = game;
   const centerX = coin.x + coin.width / 2;
   const centerY = coin.y + coin.height / 2;
@@ -99,12 +99,10 @@ function drawCoin(ctx, game) {
   ctx.arc(0, 0, radius - 8, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.fillStyle = colors.coinFace;
-  ctx.fillRect(-13, -8, 7, 7);
-  ctx.fillRect(6, -8, 7, 7);
-  ctx.fillRect(-11, 9, 22, 4);
-  ctx.fillRect(-15, 5, 5, 5);
-  ctx.fillRect(10, 5, 5, 5);
+  if (faceImage?.complete) {
+    ctx.drawImage(faceImage, -17, -17, 34, 34);
+  }
+
   ctx.restore();
 
   if (!coin.grounded) {
@@ -240,7 +238,7 @@ function updateGame(game, delta, width, setBestScore) {
   }
 }
 
-function drawGame(ctx, game, width, height) {
+function drawGame(ctx, game, width, height, faceImage) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = colors.screen;
   ctx.fillRect(0, 0, width, height);
@@ -255,7 +253,7 @@ function drawGame(ctx, game, width, height) {
     drawObstacle(ctx, obstacle);
   }
 
-  drawCoin(ctx, game);
+  drawCoin(ctx, game, faceImage);
   drawMessage(ctx, game, width);
 }
 
@@ -264,6 +262,7 @@ function App() {
   const gameRef = useRef(createGame());
   const lastTimeRef = useRef(0);
   const animationRef = useRef(0);
+  const faceImageRef = useRef(null);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(() => Number(localStorage.getItem(bestKey) || 0));
 
@@ -300,6 +299,12 @@ function App() {
   };
 
   useEffect(() => {
+    const faceImage = new Image();
+    faceImage.src = nosyFaceSrc;
+    faceImageRef.current = faceImage;
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
@@ -313,7 +318,7 @@ function App() {
         setScore(game.score);
       }
 
-      drawGame(ctx, game, canvas.width, canvas.height);
+      drawGame(ctx, game, canvas.width, canvas.height, faceImageRef.current);
       animationRef.current = requestAnimationFrame(loop);
     };
 
