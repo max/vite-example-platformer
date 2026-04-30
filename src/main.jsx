@@ -352,7 +352,7 @@ function App() {
   });
 
   return (
-    <main className="game-shell" aria-label="Coin Runner">
+    <main className="game-shell" aria-label="Nosy Run">
       <section className="hud" aria-label="Game status">
         <div>
           <span className="label">Score</span>
@@ -363,7 +363,7 @@ function App() {
           <strong>{padScore(bestScore)}</strong>
         </div>
       </section>
-      <canvas ref={canvasRef} width="900" height="320" aria-label="Coin runner game canvas" />
+      <canvas ref={canvasRef} width="900" height="320" aria-label="Nosy Run game canvas" />
       <div className="controls">
         <button type="button" onClick={jump}>Jump</button>
         <button type="button" className="restart-button" onClick={reset}>Restart</button>

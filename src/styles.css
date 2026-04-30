@@ -56,13 +56,6 @@ body {
   position: relative;
 }
 
-.hud::before {
-  color: var(--bright);
-  content: "A fatal exception 0D has occurred at 0028:D1N0RUN";
-  font-size: 14px;
-  font-weight: 700;
-}
-
 .hud div {
   display: grid;
   gap: 2px;
